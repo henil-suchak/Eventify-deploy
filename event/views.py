@@ -12,6 +12,12 @@ from .models import Event, Attendee, AttendeeRequest
 from .forms import EventForm
 from eventify.settings import EMAIL_HOST_USER
 from django.core.mail import send_mail
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from io import BytesIO
+import qrcode
 
 # ---------------------------------------------------------------------------------------------------------------------------
 #3 home page
@@ -66,7 +72,7 @@ def register_user_page(request, event_id):
 
 #8.2 Register for Event Submit
 def register_user(request, event_id):
-    """ Handles form submission for event registration """
+    """Handles form submission for event registration"""
     event = get_object_or_404(Event, id=event_id)
 
     if request.method == "POST":
@@ -79,11 +85,21 @@ def register_user(request, event_id):
         )
 
         if AttendeeRequest.objects.filter(event=event, attendee=attendee).exists():
+            # Already registered - Show message on the register page
             messages.warning(request, "You have already requested to join this event.")
+            return render(request, "event/register_user.html", {"event": event})
+
+        # Check if the maximum attendee limit is reached
+        if event.attendees.count() >= event.max_attendees:
+            messages.error(request, "Registration closed: Maximum attendee limit reached.")
+            return render(request, "event/register_user.html", {"event": event})
+
         else:
+            # New registration - Redirect to event details page with success message
             AttendeeRequest.objects.create(event=event, attendee=attendee)
             messages.success(request, "Your request has been sent to the organizer.")
-        return redirect('event:event_details', event_id=event.id)
+            return redirect('event:event_details', event_id=event.id)
+
     return redirect('event:register_user_page', event_id=event.id)
 
 #8.3 Register for Event
@@ -145,6 +161,7 @@ def manage_attendee_requests(request, event_id):
     return render(request, 'event/manage_event.html', {'event': event, 'pending_requests': pending_requests})
 
 #10.2 approve attendee request page
+
 @login_required
 def approve_attendee(request, event_id, attendee_id):
     event = get_object_or_404(Event, id=event_id)
@@ -158,11 +175,21 @@ def approve_attendee(request, event_id, attendee_id):
 
         # Generate unique QR Code
         qr_data = f"Event: {event.title}\nAttendee: {attendee.name}\nEmail: {attendee.email}"
-        qr = qrcode.make(qr_data)
+        
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(qr_data)
+        qr.make(fit=True)
 
+        qr_img = qr.make_image(fill="black", back_color="white")
+        
         # Save QR code to memory
         qr_io = BytesIO()
-        qr.save(qr_io, format="PNG")
+        qr_img.save(qr_io, format="PNG")
         qr_io.seek(0)
 
         # Create email with QR code attachment

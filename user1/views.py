@@ -22,10 +22,10 @@ def login_view(request):
 #2 Sign up
 def signup_view(request):
     if request.method == "POST":
-        form = CustomUserCreationForm(request.POST, request.FILES)  # ✅ Ensure `request.FILES` is included
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            # login(request, user)
             return redirect("login")  # Redirect to homepage or dashboard
     else:
         form = CustomUserCreationForm()

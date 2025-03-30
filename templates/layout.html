@@ -37,15 +37,9 @@
                 </form>
 
                 <!-- Profile Photo -->
-                {% if request.user.profile_picture %}
-                    <img src="{{ request.user.profile_picture.url }}" alt="Profile" 
-                         class="rounded-full border border-gray-500 object-cover" 
-                         style="width: 32px; height: 32px;">
-                {% else %}
-                    <img src="{% static 'default_profile.png' %}" alt="Profile" 
-                         class="rounded-full border border-gray-500 object-cover" 
-                         style="width: 32px; height: 32px;">
-                {% endif %}
+                <img src="{{ request.user.profile_picture.url }}" alt="Profile" 
+                    class="rounded-full border border-gray-500 object-cover" 
+                    style="width: 32px; height: 32px;">
 
                 <!-- Logout Button -->
                 
