@@ -1,0 +1,133 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 flex flex-col items-center">
+
+    <!-- Update Profile Form Section -->
+    <div class="mt-16 p-6 bg-gray-800 shadow-lg rounded-lg max-w-4xl w-full">
+        <h2 class="text-3xl font-semibold text-white mb-6 text-center">Update Profile</h2>
+
+        <!-- Messages Container -->
+        <div id="message-container" style="display: none;">
+            {% for message in messages %}
+                <span class="message" data-type="{{ message.tags }}">{{ message }}</span>
+            {% endfor %}
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-8" id="update-profile-form">
+            {% csrf_token %}
+
+            <!-- Left Column: Name, Email, Phone -->
+            <div class="space-y-6 w-full">
+                <div class="flex flex-col">
+                    <label class="text-gray-400 font-medium">Full Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-gray-400 font-medium">Email</label>
+                    {{ form.email }}
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-gray-400 font-medium">Phone Number</label>
+                    {{ form.phone_number }}
+                </div>
+            </div>
+
+            <!-- Right Column: DOB, Profile Picture -->
+            <div class="space-y-6 w-full">
+                <div class="flex flex-col">
+                    <label class="text-gray-400 font-medium">Date of Birth</label>
+                    {{ form.date_of_birth }}
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-gray-400 font-medium">Profile Picture</label>
+                    {{ form.profile_picture }}
+                </div>
+            </div>
+
+            <!-- Password Change Section -->
+            <div class="col-span-2 space-y-6 w-full">
+                <h3 class="text-xl font-semibold text-white text-center">Change Password</h3>
+
+                <div class="flex flex-col">
+                    <label class="text-gray-400 font-medium">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" class="form-input bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-2" placeholder="Enter your current password" data-password="true">
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-gray-400 font-medium">New Password</label>
+                    <input type="password" id="new_password" name="new_password" class="form-input bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-2" placeholder="Enter new password" data-password="true">
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="text-gray-400 font-medium">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-input bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-2" placeholder="Confirm new password" data-password="true">
+                </div>
+
+                <div class="flex justify-center w-full mt-4">
+                    <button type="button" id="togglePassword" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        Show Passwords
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit & Cancel Buttons -->
+            <div class="col-span-2 flex justify-center space-x-4">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md w-full md:w-auto">
+                    Update Profile
+                </button>
+                <button type="button" onclick="goBack()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md w-full md:w-auto text-center">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+    <br>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Show Messages
+    window.onload = function () {
+        let messages = document.querySelectorAll("#message-container .message");
+        if (messages.length > 0) {
+            let alertMessage = "";
+            messages.forEach(function (msg) {
+                let messageText = msg.innerText;
+                let messageType = msg.getAttribute("data-type");
+
+                if (messageType === "error") {
+                    alertMessage += "❌ " + messageText + "\n";
+                } else {
+                    alertMessage += "✅ " + messageText + "\n";
+                }
+            });
+
+            if (alertMessage !== "") {
+                alert(alertMessage);
+            }
+        }
+    };
+
+    function goBack() {
+        window.history.back();
+    }
+
+    // Show/Hide Password Toggle
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        let passwordFields = document.querySelectorAll("input[data-password]");
+        
+        let allAreText = Array.from(passwordFields).every(input => input.type === "text");
+
+        passwordFields.forEach(input => {
+            input.type = allAreText ? "password" : "text";
+        });
+
+        this.textContent = allAreText ? "Show Passwords" : "Hide Passwords";
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 text-white flex flex-col"> <!-- Dark background for the whole page -->
+
+    <!-- Hero Section - Fullscreen with dynamic animation -->
+    <div class="bg-gray-800 shadow-lg w-full text-white py-32 px-6 flex flex-col justify-center items-center h-screen opacity-0" id="hero-section">
+        <h2 class="text-5xl font-extrabold mb-6 text-purple-400">Welcome to Eventify</h2>
+        <p class="text-lg font-medium mb-6 max-w-3xl mx-auto text-center">
+            Your ultimate event management platform, designed to make creating, managing, and exploring events easier than ever before.
+        </p>
+        <a href="{% url 'event:event_list' %}" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg transition duration-300 hover:scale-105">
+            Get Started
+        </a>
+    </div>
+
+    <!-- Features - Zigzag Layout: Image, Text alternates -->
+    <div class="w-full flex-grow space-y-12 bg-gray-800">
+
+        <!-- First Zigzag: Image on Left, Text on Right -->
+        <div class="flex items-center justify-between px-8 py-12 bg-gray-800">
+            <div class="w-1/2 h-[500px] bg-cover bg-center" style="background-image: url('{% static 'images/image1.jpg' %}');"></div>
+            <div class="w-1/2 pl-8 text-white">
+                <h4 class="text-3xl font-bold mb-4">Effortless Event Creation</h4>
+                <p class="text-lg">With Eventify, you can create your event in minutes. Just input the basics, and you're ready to go live with a fully functional event page.</p>
+            </div>
+        </div>
+
+        <!-- Second Zigzag: Text on Left, Image on Right -->
+        <div class="flex items-center justify-between px-8 py-12 bg-gray-800">
+            <div class="w-1/2 pr-8 text-white">
+                <h4 class="text-3xl font-bold mb-4">Customizable Themes</h4>
+                <p class="text-lg">Tailor your event's look and feel with our collection of customizable themes, ensuring your event matches your brand or style.</p>
+            </div>
+            <div class="w-1/2 h-[500px] bg-cover bg-center" style="background-image: url('{% static 'images/image2.png' %}');"></div>
+        </div>
+
+        <!-- Third Zigzag: Image on Left, Text on Right -->
+        <div class="flex items-center justify-between px-8 py-12 bg-gray-800">
+            <div class="w-1/2 h-[500px] bg-cover bg-center" style="background-image: url('{% static 'images/image3.jpg' %}');"></div>
+            <div class="w-1/2 pl-8 text-white">
+                <h4 class="text-3xl font-bold mb-4">Seamless Ticketing</h4>
+                <p class="text-lg">Manage event tickets easily with integrated options for attendee registration, payments, and ticket distribution.</p>
+            </div>
+        </div>
+
+        <!-- Fourth Zigzag: Text on Left, Image on Right -->
+        <div class="flex items-center justify-between px-8 py-12 bg-gray-800">
+            <div class="w-1/2 pr-8 text-white">
+                <h4 class="text-3xl font-bold mb-4">Promote Like a Pro</h4>
+                <p class="text-lg">With built-in promotion tools, you can easily reach your audience via email campaigns, social media integration, and more.</p>
+            </div>
+            <div class="w-1/2 h-[500px] bg-cover bg-center" style="background-image: url('{% static 'images/image4.jpg' %}');"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Navbar Shadow Effect
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 20) {
+            navbar.classList.add('shadow-lg');
+        } else {
+            navbar.classList.remove('shadow-lg');
+        }
+    });
+
+    // Reveal content on scroll
+    const features = document.querySelectorAll('.feature');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.remove('opacity-0');
+                entry.target.classList.add('opacity-100', 'transition-opacity', 'duration-1000');
+            }
+        });
+    }, { threshold: 0.2 });
+
+    features.forEach(feature => {
+        observer.observe(feature);
+    });
+
+    // Fade in hero section on load
+    window.addEventListener('load', () => {
+        document.getElementById('hero-section').classList.remove('opacity-0');
+        document.getElementById('hero-section').classList.add('opacity-100', 'transition-opacity', 'duration-1000');
+    });
+</script>
+
+{% endblock %}

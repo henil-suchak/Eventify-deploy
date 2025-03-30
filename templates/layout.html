@@ -1,0 +1,73 @@
+{% load static tailwind_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% tailwind_css %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+            Default Value
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body class="bg-black text-white">
+
+    <!-- Navbar -->
+    <nav class="w-full bg-black shadow-md p-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-blue-500">
+            <a href="{% url 'event:home' %}">Eventify</a>
+        </h1>
+        
+        <div class="flex items-center space-x-6 text-gray-300">
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'event:home' %}" class="text-blue-400 font-semibold">Welcome, {{ request.user.name }}</span>
+                <a href="{% url 'event:event_list' %}" class="hover:text-orange-400 font-medium">Events</a>
+                <a href="{% url 'event:create_event' %}" class="hover:text-orange-400 font-medium">Create</a>
+                <a href="{% url 'event:profile' %}" class="hover:text-orange-400 font-medium">Profile</a>
+                
+                <form method="POST" action="{% url 'logout' %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirmLogout()" 
+                            class="hover:text-red-400 font-medium">
+                        Logout
+                    </button>
+                </form>
+
+                <!-- Profile Photo -->
+                {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}" alt="Profile" 
+                         class="rounded-full border border-gray-500 object-cover" 
+                         style="width: 32px; height: 32px;">
+                {% else %}
+                    <img src="{% static 'default_profile.png' %}" alt="Profile" 
+                         class="rounded-full border border-gray-500 object-cover" 
+                         style="width: 32px; height: 32px;">
+                {% endif %}
+
+                <!-- Logout Button -->
+                
+            {% else %}
+                <a href="{% url 'login' %}" class="hover:text-orange-400 font-medium">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    {% block content %}
+        Default Value
+    {% endblock %}
+
+    <footer class="w-full bg-black p-6 space-y-6 text-center text-gray-400">
+        © 2025 Eventify. All rights reserved.
+    </footer>
+
+    <!-- JavaScript for Logout Confirmation -->
+    <script>
+        function confirmLogout() {
+            return confirm("Are you sure you want to logout?");
+        }
+    </script>
+</body>
+</html>

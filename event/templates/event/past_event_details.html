@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ event.title }} | Past Event Details
+{% endblock %}
+
+{% block content %}
+    <div class="min-h-screen bg-gray-900 text-white flex flex-col items-center p-4">
+        <!-- Event Details Section -->
+        <div class="mt-16 p-6 bg-gray-800 shadow-lg rounded-lg max-w-4xl w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:items-start">
+                <!-- Event Image -->
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="rounded-lg w-full h-80 object-cover">
+                {% else %}
+                    <div class="w-full h-80 bg-gray-600 flex items-center justify-center text-gray-300">
+                        No Image Available
+                    </div>
+                {% endif %}
+
+                <!-- Event Information -->
+                <div class="w-full min-w-0">
+                    <h1 class="text-4xl font-extrabold text-orange-400 break-words">{{ event.title }}</h1>
+                    <p class="text-gray-300 mt-3 text-lg break-words break-all overflow-hidden w-full">
+                        {{ event.description }}
+                    </p>
+                    <p class="text-xl font-semibold text-gray-100 mt-4">📅 Date & Time: {{ event.date_time }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approved Attendees Section (Visible only if user is organizer) -->
+        {% if request.user == event.organizer %}
+            <div class="mt-8 p-6 bg-gray-800 shadow-lg rounded-lg max-w-4xl w-full border border-gray-700">
+                <h2 class="text-2xl font-bold text-gray-100 mb-4">👥 Approved Attendees</h2>
+                {% if event.attendees.all %}
+                    <ul class="list-none space-y-4">
+                        {% for attendee in event.attendees.all %}
+                            <li class="bg-gray-700 p-4 rounded-lg shadow-sm border border-gray-600">
+                                <span class="text-lg text-gray-300 font-medium">{{ attendee.name }} ({{ attendee.email }})</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-400 text-lg mt-3">No approved attendees.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Dynamic Back Button -->
+        <div class="mt-6 text-center">
+            <a href="{{ request.GET.next|default:'{% url "event:event_list" %}' }}"
+               class="bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-300 ease-in-out">
+                🔙 Back
+            </a>
+        </div>
+    </div>
+{% endblock %}
