@@ -20,11 +20,19 @@ import os
 import dj_database_url
 from dotenv import load_dotenv
 
+
+# import cloudinary_storage
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+#cloudinary imports
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -54,6 +62,7 @@ INSTALLED_APPS = [
     'theme',
     'django_browser_reload',
     'user1',
+    'cloudinary',
     
 ]
 
@@ -182,19 +191,25 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Load from .env
 
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Set default sender to your email
 
+# INSTALLED_APPS += [
+#     'cloudinary',
+#     'cloudinary_storage',
+# ]
 
-import cloudinary
-import cloudinary_storage
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-INSTALLED_APPS += [
-    'cloudinary',
-    'cloudinary_storage',
-]
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+#     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+#     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+# }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
-}
+
+#cloudinary - django integration
+
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+)

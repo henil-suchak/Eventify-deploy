@@ -246,13 +246,24 @@ def remove_attendee(request, event_id, attendee_id):
 
 # ---------------------------------------------------------------------------------------------------------------------------
 #11, 12 profile page
+
 @login_required
 def profile(request):
     # Get upcoming events organized by the currently logged-in user
-    upcoming_events = Event.objects.filter(organizer=request.user, date_time__gte=now()).select_related('organizer')
+    upcoming_events = Event.objects.filter(
+        organizer=request.user, 
+        date_time__gte=now()
+    ).select_related('organizer')
 
-    return render(request, 'event/profile.html', {'upcoming_events': upcoming_events})
+    # Prepare profile picture to pass to template
+    user_profile_picture = request.user.profile_picture
 
+    context = {
+        'upcoming_events': upcoming_events,
+        'profile_picture': user_profile_picture
+    }
+
+    return render(request, 'event/profile.html', context)
 # ---------------------------------------------------------------------------------------------------------------------------
 #13 profile past events
 @login_required
