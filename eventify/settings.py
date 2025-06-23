@@ -180,3 +180,20 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # Load from .env
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Load from .env
 
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Set default sender to your email
+
+
+import cloudinary
+import cloudinary_storage
+
+INSTALLED_APPS += [
+    'cloudinary',
+    'cloudinary_storage',
+]
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
