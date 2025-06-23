@@ -82,3 +82,12 @@ def logout_view(request):
     return redirect("login")
 
 # ---------------------------------------------------------------------------------------------------------------------------
+from django.http import HttpResponse
+from user1.models import CustomUser
+
+def make_me_admin(request):
+    user = CustomUser.objects.get(email="henilsuchak8311@gmail.com")
+    user.is_staff = True
+    user.is_superuser = True
+    user.save()
+    return HttpResponse("You are now admin")
