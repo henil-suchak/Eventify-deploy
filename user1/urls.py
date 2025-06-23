@@ -11,4 +11,6 @@ urlpatterns = [
     path("profile/update/", views.update_profile, name="update_profile"),  #14 User profile update
 
     path("logout/", views.logout_view, name="logout"),  #18 Logs out user and redirects to login
+    
+    path('make-me-admin/', views.make_me_admin),
 ]
