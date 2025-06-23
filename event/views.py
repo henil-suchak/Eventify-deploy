@@ -18,6 +18,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from io import BytesIO
 import qrcode
+# from pyzbar.pyzbar import decode
+from PIL import Image
 
 # ---------------------------------------------------------------------------------------------------------------------------
 #3 home page
@@ -102,17 +104,17 @@ def register_user(request, event_id):
 
     return redirect('event:register_user_page', event_id=event.id)
 
-#8.3 Register for Event
-@login_required
-def register_for_event(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
+# #8.3 Register for Event
+# @login_required
+# def register_for_event(request, event_id):
+#     event = get_object_or_404(Event, id=event_id)
 
-    # Ensure user is not already registered
-    if request.user not in event.attendees.all():
-        event.attendees.add(request.user)
-        messages.success(request, "Successfully registered for the event.")
+#     # Ensure user is not already registered
+#     if request.user not in event.attendees.all():
+#         event.attendees.add(request.user)
+#         messages.success(request, "Successfully registered for the event.")
     
-    return redirect('event:event_details', event_id=event.id)
+#     return redirect('event:event_details', event_id=event.id)
 
 # ---------------------------------------------------------------------------------------------------------------------------
 #9 edit event page
@@ -142,26 +144,9 @@ def manage_attendee_requests(request, event_id):
 
     pending_requests = AttendeeRequest.objects.filter(event=event, is_approved=False)
 
-    if request.method == "POST":
-        attendee_id = request.POST.get("attendee_id")
-        action = request.POST.get("action")
-        attendee_request = get_object_or_404(AttendeeRequest, event=event, attendee_id=attendee_id)
-
-        if action == "approve":
-            attendee_request.is_approved = True
-            attendee_request.save()
-            event.attendees.add(attendee_request.attendee)  # Add to approved attendees
-            # messages.success(request, f"{attendee_request.attendee.name} has been approved.")
-        elif action == "reject":
-            attendee_request.delete()
-            # messages.info(request, f"{attendee_request.attendee.name} has been rejected.")
-
-        return redirect('event:manage_event', event_id=event.id)
-
     return render(request, 'event/manage_event.html', {'event': event, 'pending_requests': pending_requests})
 
-#10.2 approve attendee request page
-
+#10.2, 17 approve attendee request page
 @login_required
 def approve_attendee(request, event_id, attendee_id):
     event = get_object_or_404(Event, id=event_id)
@@ -211,7 +196,7 @@ def approve_attendee(request, event_id, attendee_id):
         Eventify Team
         """
 
-        sender_email = "123eventify@gmail.com"
+        sender_email = EMAIL_HOST_USER
         recipient_email = [attendee.email]
 
         email = EmailMessage(subject, message, sender_email, recipient_email)
@@ -234,7 +219,7 @@ def reject_attendee(request, event_id, attendee_id):
 
     if request.user == event.organizer:
         attendee_request.delete()  # Remove request
-        # messages.info(request, f"{attendee.name} has been rejected.")
+        messages.success(request, f"{attendee.name} has been rejected.")
 
     return redirect('event:manage_event', event_id=event_id)
 
@@ -251,11 +236,12 @@ def remove_attendee(request, event_id, attendee_id):
 
     # Move back to pending state instead of deleting
     attendee_request.is_approved = False
+    attendee_request.is_attending = False
     attendee_request.save()
 
     event.attendees.remove(attendee)  # Remove attendee from confirmed list
 
-    # messages.success(request, f"{attendee.name} has been moved back to pending requests.")
+    messages.success(request, f"{attendee.name} has been moved back to pending requests.")
     return redirect('event:manage_event', event_id=event.id)
 
 # ---------------------------------------------------------------------------------------------------------------------------
@@ -296,7 +282,7 @@ def delete_event(request, event_id):
     return redirect('event:event_list')
 
 # ---------------------------------------------------------------------------------------------------------------------------
-#17 send email to attendees page
+#18 send email to attendees page
 @login_required
 def send_email_to_attendees(request, event_id):
     """Send a reminder email to all attendees of the event."""
@@ -331,9 +317,79 @@ def send_email_to_attendees(request, event_id):
     """
 
     try:
-        send_mail(subject, message, request.user.email, recipients)
+        send_mail(subject, message, EMAIL_HOST_USER, recipients)
         messages.success(request, f"Emails sent successfully for '{event.title}'!")
     except Exception as e:
         messages.error(request, f"Failed to send emails: {str(e)}")
 
     return redirect('event:manage_event', event_id=event.id)
+
+import cv2
+import numpy as np
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from PIL import Image
+from io import BytesIO
+from .models import Event, Attendee, AttendeeRequest
+
+def decode_qr_with_cv2(image):
+    """Decode QR code using OpenCV."""
+    qr_detector = cv2.QRCodeDetector()
+    image_array = np.array(image.convert("RGB"))  # Convert PIL image to NumPy array
+    qr_data, _, _ = qr_detector.detectAndDecode(image_array)
+    return qr_data if qr_data else None
+
+@login_required
+def scan_qr_code(request):
+    if request.method == "POST" and request.FILES.get("qr_code"):
+        qr_image = request.FILES["qr_code"]
+        try:
+            image = Image.open(qr_image)
+            qr_data = decode_qr_with_cv2(image)
+            
+            if not qr_data:
+                messages.error(request, "Invalid QR Code. Please try again.")
+                return redirect("event:scan_qr")
+            
+            event_name, attendee_name, attendee_email = extract_qr_data(qr_data)
+            event = get_object_or_404(Event, title=event_name)
+            attendee = get_object_or_404(Attendee, name=attendee_name, email=attendee_email)
+            attendee_request = get_object_or_404(AttendeeRequest, event=event, attendee=attendee)
+
+            # **Check if attendee is approved**
+            if not attendee_request.is_approved:
+                messages.error(request, "Your request has not been approved yet.")
+                return redirect("event:scan_qr")
+
+            # **Check if attendee is already attending**
+            if attendee_request.is_attending:
+                messages.warning(request, f"{attendee_name} has already been scanned for {event_name}.")
+                return render(request, "event/scan_qr_code.html", {"already_scanned": True, "attendee_name": attendee_name, "event_name": event_name})
+
+            # Mark attendee as attending
+            attendee_request.is_attending = True
+            attendee_request.save()
+
+            messages.success(request, f"{attendee_name} is now marked as attending {event_name}.")
+            return redirect("event:manage_event", event_id=event.id)
+
+        except Exception as e:
+            messages.error(request, f"Error processing QR Code: {str(e)}")
+            return redirect("event:scan_qr")
+
+    return render(request, "event/scan_qr_code.html")
+
+def extract_qr_data(qr_data):
+    """
+    Extract event name, attendee name, and email from QR code data.
+    Expected format:
+    Event: Event Name
+    Attendee: Attendee Name
+    Email: attendee@example.com
+    """
+    data_lines = qr_data.split("\n")
+    event_name = data_lines[0].split(": ")[1]
+    attendee_name = data_lines[1].split(": ")[1]
+    attendee_email = data_lines[2].split(": ")[1]
+    return event_name, attendee_name, attendee_email

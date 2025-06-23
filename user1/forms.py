@@ -114,3 +114,5 @@ class CustomUserUpdateForm(forms.ModelForm):
                 raise forms.ValidationError("New passwords do not match.")
 
         return cleaned_data
+    
+#-----------------------------------------------------------------------------------------------------------------------------------

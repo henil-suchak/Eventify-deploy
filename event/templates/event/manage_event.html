@@ -69,15 +69,31 @@
             <ul class="list-none space-y-4">
                 {% for attendee in event.attendees.all %}
                     <li class="flex justify-between items-center bg-gray-700 p-4 rounded-lg shadow-sm border border-gray-600">
+                        <!-- Name & Email on the left -->
                         <span class="text-lg text-gray-300 font-medium">{{ attendee.name }} ({{ attendee.email }})</span>
-                        {% if event.organizer == request.user %}
-                            <form method="POST" action="{% url 'event:remove_attendee' event.id attendee.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md">
-                                    ❌ Remove
-                                </button>
-                            </form>
-                        {% endif %}
+
+                        <div class="flex items-center space-x-4">
+                            <!-- "Attending" label on the right -->
+                            {% with attendee.attendeerequest_set.first as request_obj %}
+                                <span class="px-3 py-1 rounded-md text-sm font-semibold flex items-center space-x-1
+                                    {% if request_obj and request_obj.is_attending %} bg-green-600 text-white {% else %} bg-red-600 text-white {% endif %}">
+                                    {% if request_obj and request_obj.is_attending %}
+                                        ✅ <span>Attending</span>
+                                    {% else %}
+                                        ❌ <span>Attending</span>
+                                    {% endif %}
+                                </span>
+                            {% endwith %}
+                            <!-- Remove Button -->
+                            {% if event.organizer == request.user %}
+                                <form method="POST" action="{% url 'event:remove_attendee' event.id attendee.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md">
+                                        ❌ Remove
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
                     </li>
                 {% endfor %}
             </ul>
@@ -85,8 +101,6 @@
             <p class="text-gray-400 text-lg mt-3">No attendees yet.</p>
         {% endif %}
     </div>
-
-    <br>
 
     <!-- Send Email to All Attendees Button -->
     {% if event.attendees.all %}
@@ -105,6 +119,12 @@
         </form>        
     </div>
     {% endif %}
+
+    <div class="mt-8">
+        <button onclick="scanQRCode()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md flex items-center">
+            📷 Scan QR Code
+        </button>
+    </div>
 
     <!-- Dynamic Back Button -->
     <div class="mt-6 text-center">
@@ -135,7 +155,6 @@
         buttonText.textContent = "Sending...";
         loadingSpinner.classList.remove("hidden");
 
-        // Optional: Enable button again after 5 seconds
         setTimeout(() => {
             button.disabled = false;
             button.classList.remove("bg-gray-500", "cursor-not-allowed");
@@ -143,6 +162,10 @@
             buttonText.textContent = "📧 Send Reminder Email";
             loadingSpinner.classList.add("hidden");
         }, 5000);
+    }
+
+    function scanQRCode() {
+        window.location.href = "{% url 'event:scan_qr'  %}";
     }
 </script>
 {% endblock %}

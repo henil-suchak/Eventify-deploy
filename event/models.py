@@ -30,8 +30,10 @@ class AttendeeRequest(models.Model):
     attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
     requested_at = models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=False)  # Default is pending approval
-    is_attending = models.BooleanField(default=True)  # Track if attendee is still attending
+    is_attending = models.BooleanField(default=False)  # Track if attendee is still attending
 
     def __str__(self):
         status = "Going" if self.is_attending else "Not Going"
         return f"{self.attendee.name} requested for {self.event.title} - {status}"
+
+#-----------------------------------------------------------------------------------------------------------------------------------

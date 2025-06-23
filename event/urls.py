@@ -5,6 +5,7 @@ from .views import send_email_to_attendees
 
 # localhost:8000/event/
 app_name = "event"  # Namespace for the app
+
 urlpatterns = [
     path('home/', views.home, name='home'), #3 Home page
 
@@ -22,7 +23,7 @@ urlpatterns = [
     path('<int:event_id>/edit_event/', views.edit_event, name='edit_event'), #9 edit event
 
     path('event/<int:event_id>/manage/', views.manage_attendee_requests, name='manage_event'), #10.1 Manage event attendee requests
-    path('approve-attendee/<int:event_id>/<int:attendee_id>/', views.approve_attendee, name='approve_attendee'), #10.2 Approve attendee request
+    path('approve-attendee/<int:event_id>/<int:attendee_id>/', views.approve_attendee, name='approve_attendee'), #10.2, 17 Approve attendee request
     path('reject-attendee/<int:event_id>/<int:attendee_id>/', views.reject_attendee, name='reject_attendee'), #10.3 Reject attendee request
     path('event/<int:event_id>/remove-attendee/<int:attendee_id>/', views.remove_attendee, name='remove_attendee'), #10.4 Remove attendee from event
 
@@ -34,6 +35,7 @@ urlpatterns = [
 
     path('<int:event_id>/delete_event/', views.delete_event, name='delete_event'), #16 Delete Event
 
-    path('event/<int:event_id>/send-email/', send_email_to_attendees, name='send_email_to_attendees'), #17 Send email to attendees
+    path('event/<int:event_id>/send-email/', send_email_to_attendees, name='send_email_to_attendees'), #18 Send email to all attendees
 
+    path("scan_qr/", views.scan_qr_code, name="scan_qr"), #20
 ]

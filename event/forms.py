@@ -28,3 +28,5 @@ class EventForm(forms.ModelForm):
             raise forms.ValidationError("Event must be scheduled at least 5 hours from now.")
 
         return event_date
+    
+#-----------------------------------------------------------------------------------------------------------------------------------

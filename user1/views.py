@@ -74,7 +74,9 @@ def update_profile(request):
     return render(request, "user1/update_profile.html", {"form": form})
 
 # ---------------------------------------------------------------------------------------------------------------------------
-#18 Logout
+#19 Logout
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+# ---------------------------------------------------------------------------------------------------------------------------

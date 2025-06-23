@@ -1,0 +1,8 @@
+Django==5.2.3
+dj_database_url==3.0.0
+python-dotenv==1.1.0
+whitenoise
+psycopg2-binary
+Pillow==11.2.1
+qrcode==8.2
+redis==6.2.0

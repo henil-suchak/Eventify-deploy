@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+# localhost:8000/
+
 urlpatterns = [
     path("", views.login_view, name="login"),  #1 Custom login view
 
