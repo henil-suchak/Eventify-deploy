@@ -27,6 +27,8 @@ def signup_view(request):
             user = form.save()
             # login(request, user)
             return redirect("login")  # Redirect to homepage or dashboard
+        else:
+            print(form.errors)  # Debug: show form validation errors
     else:
         form = CustomUserCreationForm()
     
