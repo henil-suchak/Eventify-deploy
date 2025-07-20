@@ -44,8 +44,9 @@ import cloudinary.uploader
 # DEBUG = True
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-DEBUG = os.getenv("DEBUG", "False") == "True"
+# DEBUG = os.getenv("DEBUG", "False") == "True"
 
+DEBUG=True
 ALLOWED_HOSTS = ['eventify-deploy.onrender.com']
 
 # Application definition
