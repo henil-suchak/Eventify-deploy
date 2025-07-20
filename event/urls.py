@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.urls import path
 from .views import send_email_to_attendees
@@ -38,4 +38,7 @@ urlpatterns = [
     path('event/<int:event_id>/send-email/', send_email_to_attendees, name='send_email_to_attendees'), #18 Send email to all attendees
 
     path("scan_qr/", views.scan_qr_code, name="scan_qr"), #20
+    
+    path('payments/', include('payments.urls')), # Include your payment app's URLs
+
 ]

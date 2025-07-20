@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'django_browser_reload',
     'user1',
     'cloudinary',
+    'payments',
     
 ]
 
@@ -213,3 +214,7 @@ cloudinary.config(
     api_key=os.getenv('CLOUDINARY_API_KEY'),
     api_secret=os.getenv('CLOUDINARY_API_SECRET'),
 )
+
+# settings.py
+RAZORPAY_KEY_ID = 'rzp_test_KPPT23qlYRsruq'
+RAZORPAY_KEY_SECRET = 'Xt2c4QgO8zQzK12JodJSmO7e'
