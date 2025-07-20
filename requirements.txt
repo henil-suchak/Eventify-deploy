@@ -11,3 +11,4 @@ django-tailwind==3.5.0
 opencv-python==4.11.0.86
 cloudinary
 django-cloudinary-storage
+razorpay==1.4.2
