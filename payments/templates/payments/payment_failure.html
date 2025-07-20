@@ -1,17 +1,12 @@
+<!-- payments/templates/payments/payment_failure.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Failed</title>
 </head>
 <body>
-    <h1>Payment Failed!</h1>
-    <p>There was an error processing your payment.</p>
-    {% if error %}
-        <p>Error: {{ error }}</p>
-    {% endif %}
-    <p>Please try again later or contact support.</p>
-    <a href="{% url 'payments:initiate_payment' %}">Try again</a>
+    <h2>❌ Payment Failed</h2>
+    <p>{{ error|default:"Something went wrong. Please try again." }}</p>
+    <a href="{% url 'event:event_list' %}">Go to Events</a>
 </body>
 </html>

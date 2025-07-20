@@ -1,74 +1,27 @@
+<!-- payments/templates/payments/payment_page.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Make Payment</title>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <title>Pay for Event</title>
 </head>
 <body>
-    <h1>Complete Your Payment</h1>
-    <p>Amount: {{ amount|floatformat:2|divide_by_100 }} {{ currency }}</p>
+    <h2>Pay ₹{{ amount|floatformat:-2 }} for "{{ name }}"</h2>
 
-    <button id="rzp-button1">Pay with Razorpay</button>
-
-    <script>
-        var options = {
-            "key": "{{ razorpay_key }}", // Enter the Key ID generated from the Dashboard
-            "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR.
-            "currency": "{{ currency }}",
-            "name": "{{ name }}",
-            "description": "{{ description }}",
-            "order_id": "{{ order_id }}", //This is a sample Order ID. Pass the `id` attribute of the order created on your backend
-            "handler": function (response){
-                // This function is called after successful payment on Razorpay's end
-                // Send the response data to your Django backend for verification
-                var form = document.createElement('form');
-                form.method = 'POST';
-                form.action = "{% url 'payments:payment_success' %}";
-                form.style.display = 'none';
-
-                var csrfTokenInput = document.createElement('input');
-                csrfTokenInput.type = 'hidden';
-                csrfTokenInput.name = 'csrfmiddlewaretoken';
-                csrfTokenInput.value = '{{ csrf_token }}';
-                form.appendChild(csrfTokenInput);
-
-                var paymentIdInput = document.createElement('input');
-                paymentIdInput.type = 'hidden';
-                paymentIdInput.name = 'razorpay_payment_id';
-                paymentIdInput.value = response.razorpay_payment_id;
-                form.appendChild(paymentIdInput);
-
-                var orderIdInput = document.createElement('input');
-                orderIdInput.type = 'hidden';
-                orderIdInput.name = 'razorpay_order_id';
-                orderIdInput.value = response.razorpay_order_id;
-                form.appendChild(orderIdInput);
-
-                var signatureInput = document.createElement('input');
-                signatureInput.type = 'hidden';
-                signatureInput.name = 'razorpay_signature';
-                signatureInput.value = response.razorpay_signature;
-                form.appendChild(signatureInput);
-
-                document.body.appendChild(form);
-                form.submit();
-            },
-            "prefill": {
-                "name": "User Name", // Optional
-                "email": "user.email@example.com", // Optional
-                "contact": "9999999999" // Optional
-            },
-            "theme": {
-                "color": "#3399cc"
-            }
-        };
-        var rzp1 = new Razorpay(options);
-        document.getElementById('rzp-button1').onclick = function(e){
-            rzp1.open();
-            e.preventDefault();
-        }
-    </script>
+    <form action="{% url 'payments:handle_payment_success' %}" method="POST">
+        <script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            data-key="{{ razorpay_key }}"
+            data-amount="{{ amount }}"
+            data-currency="{{ currency }}"
+            data-order_id="{{ order_id }}"
+            data-buttontext="Pay ₹{{ amount|floatformat:-2 }}"
+            data-name="{{ name }}"
+            data-description="{{ description }}"
+            data-prefill.name="{{ request.user.get_full_name }}"
+            data-prefill.email="{{ request.user.email }}"
+            data-theme.color="#F37254">
+        </script>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    </form>
 </body>
 </html>

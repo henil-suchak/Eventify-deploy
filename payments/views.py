@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
 # payments/views.py
@@ -12,32 +12,31 @@ import json
 # authorize razorpay client with API Keys.
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-def initiate_payment(request):
+
+# Assume Event model is imported from your events app
+from events.models import Event
+
+def initiate_payment(request, event_id):
     if request.method == "GET":
-        # Example: You might get amount from a product in your database
-        amount = 50000  # Amount in paisa (e.g., 500 INR = 50000 paisa)
+        event = get_object_or_404(Event, id=event_id)
+        amount_inr = 200  # Fixed entry pass for all events
+        amount = amount_inr * 100  # Convert to paisa
         currency = 'INR'
 
-        # Create a Razorpay Order
-        razorpay_order = razorpay_client.order.create(dict(amount=amount,
-                                                            currency=currency,
-                                                            payment_capture='0')) # '0' means manual capture, '1' for auto capture
-
-        # Store order details in your database if needed (e.g., Order model)
-        # order = Order.objects.create(
-        #     amount=amount / 100,  # Convert back to INR for your database
-        #     razorpay_order_id=razorpay_order['id'],
-        #     status='created'
-        # )
-        # order.save()
+        razorpay_order = razorpay_client.order.create({
+            "amount": amount,
+            "currency": currency,
+            "payment_capture": '0'
+        })
 
         context = {
             'razorpay_key': settings.RAZORPAY_KEY_ID,
             'amount': amount,
             'currency': currency,
             'order_id': razorpay_order['id'],
-            'name': 'Your Company Name',
-            'description': 'Product/Service Description',
+            'name': event.name,
+            'description': event.description,
+            'event_id': event.id
         }
         return render(request, 'payments/payment_page.html', context)
     return HttpResponseBadRequest("Method not allowed")
