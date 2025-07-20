@@ -216,5 +216,5 @@ cloudinary.config(
 )
 
 # settings.py
-RAZORPAY_KEY_ID = 'rzp_test_KPPT23qlYRsruq'
-RAZORPAY_KEY_SECRET = 'Xt2c4QgO8zQzK12JodJSmO7e'
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')
