@@ -1,3 +1,4 @@
+{% load static %}
 {% extends "layout.html" %}
 
 {% block title %}
@@ -59,12 +60,12 @@
                         Cancel
                     </a>
                 </div>
-                {% comment %} <div class="col-span-2 flex justify-center mt-4">
-                    <a href="{% url 'payments:initiate_payment' event.id %}" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md w-full transition duration-300 text-center">
-                        Pay ₹200 Entry Fee
-                    </a>
-                </div> {% endcomment %}
             </form>
+            <div class="col-span-2 flex justify-center mt-4">
+                <a href="{% url 'payments:initiate_payment' event.id %}" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md w-full transition duration-300 text-center">
+                    Pay ₹200 Entry Fee
+                </a>
+            </div>
         </div>
     </div>
 {% endblock %}
