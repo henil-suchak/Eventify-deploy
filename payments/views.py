@@ -77,3 +77,9 @@ def handle_payment_success(request):
         except Exception as e:
             return render(request, 'payments/payment_failure.html', {'error': str(e)})
     return HttpResponseBadRequest("Method not allowed")
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def handle_payment_failure(request):
+    return render(request, 'payments/payment_failure.html', {'error': 'Payment failed or cancelled.'})
