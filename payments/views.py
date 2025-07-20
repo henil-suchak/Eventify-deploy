@@ -14,11 +14,11 @@ razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZOR
 
 
 # Assume Event model is imported from your events app
-from events.models import Event
+# from events.models import Event
 
 def initiate_payment(request, event_id):
     if request.method == "GET":
-        event = get_object_or_404(Event, id=event_id)
+        # event = get_object_or_404(Event, id=event_id)
         amount_inr = 200  # Fixed entry pass for all events
         amount = amount_inr * 100  # Convert to paisa
         currency = 'INR'
@@ -34,9 +34,9 @@ def initiate_payment(request, event_id):
             'amount': amount,
             'currency': currency,
             'order_id': razorpay_order['id'],
-            'name': event.name,
-            'description': event.description,
-            'event_id': event.id
+            # 'name': event.name,
+            # 'description': event.description,
+            # 'event_id': event.id
         }
         return render(request, 'payments/payment_page.html', context)
     return HttpResponseBadRequest("Method not allowed")
