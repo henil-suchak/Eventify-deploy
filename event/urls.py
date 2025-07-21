@@ -39,6 +39,6 @@ urlpatterns = [
 
     path("scan_qr/", views.scan_qr_code, name="scan_qr"), #20
     
-    path('payments/', include(('payments.urls', 'payments'), namespace='payments')),
+    path('payments/', include('payments.urls')), # Include your payment app's URLs
 
 ]

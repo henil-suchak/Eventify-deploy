@@ -16,6 +16,8 @@ urlpatterns = [
     path('user1/',include('user1.urls')),
 
     path("__reload__/", include("django_browser_reload.urls")),
+    path('payments/', include(('payments.urls', 'payments'), namespace='payments')),
+
 ]
 
 if settings.DEBUG:
