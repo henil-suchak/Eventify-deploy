@@ -16,7 +16,7 @@ razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZOR
 # Assume Event model is imported from your events app
 # from events.models import Event
 
-def initiate_payment(request, event_id):
+def initiate_payment(request):
     if request.method == "GET":
         # event = get_object_or_404(Event, id=event_id)
         amount_inr = 200  # Fixed entry pass for all events
